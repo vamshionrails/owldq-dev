@@ -15,5 +15,12 @@ jobs:
 
     - name: Set up environment variables
       run: |
-        REPO_CONFIG=$(cat owldq-dev.json)
-        echo "REPO_CONFIG=$REPO_CONFIG" >> $GITHUB_ENV
+        echo "REPO_NAME=owldq-dev" >> $GITHUB_ENV
+        echo "DESCRIPTION=Your repository description" >> $GITHUB_ENV
+        echo "PRIVATE=false" >> $GITHUB_ENV
+        echo "INITIALIZE_README=true" >> $GITHUB_ENV
+        echo "DELETE_REPO=false" >> $GITHUB_ENV
+        echo "USERNAME=vamshionrails" >> $GITHUB_ENV
+        echo "HELMFILE_PATH=./helmfile.yaml" >> $GITHUB_ENV
+        echo "CHARTS_PATH=./helmcharts" >> $GITHUB_ENV
+        echo "REPO_URL=https://raw.githubusercontent.com/\$USERNAME/\$REPO_NAME/main/helmcharts" >> $GITHUB_ENV
