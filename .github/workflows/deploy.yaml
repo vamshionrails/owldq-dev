@@ -19,25 +19,11 @@ jobs:
     - name: Set up environment variables
       run: |
         CONFIG_JSON=$(cat owldq-dev.json)
-        REPO_NAME=$(echo $CONFIG_JSON | jq -r '.REPO_NAME')
-        DESCRIPTION=$(echo $CONFIG_JSON | jq -r '.DESCRIPTION')
-        PRIVATE=$(echo $CONFIG_JSON | jq -r '.PRIVATE')
-        INITIALIZE_README=$(echo $CONFIG_JSON | jq -r '.INITIALIZE_README')
-        DELETE_REPO=$(echo $CONFIG_JSON | jq -r '.DELETE_REPO')
-        USERNAME=$(echo $CONFIG_JSON | jq -r '.USERNAME')
-        HELMFILE_PATH=$(echo $CONFIG_JSON | jq -r '.HELMFILE_PATH')
-        CHARTS_PATH=$(echo $CONFIG_JSON | jq -r '.CHARTS_PATH')
-        REPO_URL=$(echo $CONFIG_JSON | jq -r '.REPO_URL')
-
-        echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
-        echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
-        echo "PRIVATE=$PRIVATE" >> $GITHUB_ENV
-        echo "INITIALIZE_README=$INITIALIZE_README" >> $GITHUB_ENV
-        echo "DELETE_REPO=$DELETE_REPO" >> $GITHUB_ENV
-        echo "USERNAME=$USERNAME" >> $GITHUB_ENV
-        echo "HELMFILE_PATH=$HELMFILE_PATH" >> $GITHUB_ENV
-        echo "CHARTS_PATH=$CHARTS_PATH" >> $GITHUB_ENV
-        echo "REPO_URL=$REPO_URL" >> $GITHUB_ENV
+        for key in $(echo $CONFIG_JSON | jq -r 'keys_unsorted[]'); do
+          value=$(echo $CONFIG_JSON | jq -r ".$key")
+          echo "$key=$value" >> $GITHUB_ENV
+        done 
+        
     - name: values for varaiables
       run: |
         echo "DESCRIPTION=$DESCRIPTION"
