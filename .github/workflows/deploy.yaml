@@ -20,10 +20,10 @@ jobs:
 
     - name: Load JSON and set variables
       run: |
-        JSON_CONTENT=$(cat owldq-dev.json)
+        JSON_CONTENT=$(cat path/to/your/config.json)
 
         set_env_var() {
-          echo "$1=$(python -c "import sys, json; print(json.load(sys.stdin)$2" <<< "$JSON_CONTENT")" >> $GITHUB_ENV
+          echo "$1=$(python -c "import sys, json; print(json.load(sys.stdin)$2")" >> $GITHUB_ENV
         }
 
         set_env_var "REPO_NAME" "['REPO_NAME']"
