@@ -13,25 +13,30 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+
     - name: Load JSON and set variables
-      id: set-env-vars
       run: |
         JSON_CONTENT=$(cat owldq-dev.json)
-        echo "JSON_CONTENT=$JSON_CONTENT" >> $GITHUB_ENV
 
-        # Set individual variables
-        echo "REPO_NAME=$(echo "$JSON_CONTENT" | jq -r '.REPO_NAME')" >> $GITHUB_ENV
-        echo "DESCRIPTION=$(echo "$JSON_CONTENT" | jq -r '.DESCRIPTION')" >> $GITHUB_ENV
-        echo "PRIVATE=$(echo "$JSON_CONTENT" | jq -r '.PRIVATE')" >> $GITHUB_ENV
+        set_env_var() {
+          echo "$1=$(python -c "import sys, json; print(json.load(sys.stdin)$2" <<< "$JSON_CONTENT")" >> $GITHUB_ENV
+        }
+
+        set_env_var "REPO_NAME" "['REPO_NAME']"
+        set_env_var "DESCRIPTION" "['DESCRIPTION']"
+        set_env_var "PRIVATE" "['PRIVATE']"
 
         # Set nested variables
-        echo "TEST_NAME=$(echo "$JSON_CONTENT" | jq -r '.TEST.TEST_NAME')" >> $GITHUB_ENV
+        set_env_var "TEST_NAME" "['TEST']['TEST_NAME']"
 
         # Set variables from TEST_ARRAY
-        TEST_ARRAY_LENGTH=$(echo "$JSON_CONTENT" | jq -r '.TEST_ARRAY | length')
+        TEST_ARRAY_LENGTH=$(python -c "import sys, json; print(len(json.load(sys.stdin)['TEST_ARRAY']))" <<< "$JSON_CONTENT")
         for ((i=0; i<$TEST_ARRAY_LENGTH; i++)); do
-          TEST_ARRAY_NAME=$(echo "$JSON_CONTENT" | jq -r ".TEST_ARRAY[$i].TEST_ARRAY_NAME")
-          echo "TEST_ARRAY_NAME_$i=$TEST_ARRAY_NAME" >> $GITHUB_ENV
+          set_env_var "TEST_ARRAY_NAME_$i" "['TEST_ARRAY'][$i]['TEST_ARRAY_NAME']"
         done
 
     - name: Display environment variables
