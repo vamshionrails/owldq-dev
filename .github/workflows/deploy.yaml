@@ -16,8 +16,7 @@ jobs:
     - name: Setup
       id: setup
       run: |
-        # Create config.json file
-        echo '[
+        CONFIG='[
           {
             "project": "foo",
             "config": "Debug",
@@ -39,10 +38,9 @@ jobs:
               }
             ]
           }
-        ]' > config.json
+        ]'
 
-        # Output matrix
-        echo "matrix=$(jq -r -c . < config.json)" >> $GITHUB_ENV
+        echo "matrix=$(echo \"$CONFIG\" | jq -r -c .)" >> $GITHUB_ENV
     
     - name: Check
       run: jq . <<< "${{ steps.setup.outputs.matrix }}"
@@ -53,8 +51,8 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      matrix: 
-        include: ${{ fromJSON(needs.step1.outputs.matrix) }}
+      matrix:
+        include: ${{fromJson(needs.step1.outputs.matrix)}}
 
     steps:
     - name: Check
