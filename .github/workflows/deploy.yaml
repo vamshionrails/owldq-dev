@@ -27,7 +27,7 @@ jobs:
 
     - name: Load JSON and set variables
       run: |
-        string="vamshionrails/owldq-dev.json"
+        string="$GITHUB_REPOSITORY"
         result="${string#vamshionrails/}"
         echo "$result"
 
