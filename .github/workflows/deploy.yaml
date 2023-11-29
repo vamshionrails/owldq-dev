@@ -38,3 +38,6 @@ jobs:
         echo "HELMFILE_PATH=$HELMFILE_PATH" >> $GITHUB_ENV
         echo "CHARTS_PATH=$CHARTS_PATH" >> $GITHUB_ENV
         echo "REPO_URL=$REPO_URL" >> $GITHUB_ENV
+    - name: values for varaiables
+      run: |
+        echo "DESCRIPTION=$DESCRIPTION"
