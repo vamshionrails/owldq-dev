@@ -27,7 +27,7 @@ jobs:
 
     - name: Load JSON and set variables
       run: |
-        JSON_CONTENT=$(cat ${{ env.GITHUB_REPOSITORY }}.json)
+        JSON_CONTENT=$(cat $GITHUB_REPOSITORY.json)
 
         set_env_var() {
           echo "$1=$(echo "$JSON_CONTENT" | jq -r "$2")" >> $GITHUB_ENV
@@ -49,6 +49,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           REPO_NAME: ${{ env.REPO_NAME }}
           DESCRIPTION: ${{ env.DESCRIPTION }}
+          GITHUB_REPOSITORY: ${{ env.GITHUB_REPOSITORY }}
 
     - name: Display environment variables
       run: env
