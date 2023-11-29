@@ -1,6 +1,9 @@
 name: populate_matrix_from_json
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   step1:
