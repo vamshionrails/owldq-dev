@@ -18,25 +18,28 @@ jobs:
       with:
         python-version: 3.x
 
+    - name: Install jq
+      run: sudo apt-get install jq
+
     - name: Load JSON and set variables
       run: |
         JSON_CONTENT=$(cat owldq-dev.json)
 
         set_env_var() {
-          echo "$1=$(python -c "import sys, json; print(json.load(sys.stdin)$2")" >> $GITHUB_ENV
+          echo "$1=$(echo "$JSON_CONTENT" | jq -r "$2")" >> $GITHUB_ENV
         }
 
-        set_env_var "REPO_NAME" "['REPO_NAME']"
-        set_env_var "DESCRIPTION" "['DESCRIPTION']"
-        set_env_var "PRIVATE" "['PRIVATE']"
+        set_env_var "REPO_NAME" '.REPO_NAME'
+        set_env_var "DESCRIPTION" '.DESCRIPTION'
+        set_env_var "PRIVATE" '.PRIVATE'
 
         # Set nested variables
-        set_env_var "TEST_NAME" "['TEST']['TEST_NAME']"
+        set_env_var "TEST_NAME" '.TEST.TEST_NAME'
 
         # Set variables from TEST_ARRAY
-        TEST_ARRAY_LENGTH=$(python -c "import sys, json; print(len(json.load(sys.stdin)['TEST_ARRAY']))" <<< "$JSON_CONTENT")
+        TEST_ARRAY_LENGTH=$(echo "$JSON_CONTENT" | jq -r '.TEST_ARRAY | length')
         for ((i=0; i<$TEST_ARRAY_LENGTH; i++)); do
-          set_env_var "TEST_ARRAY_NAME_$i" "['TEST_ARRAY'][$i]['TEST_ARRAY_NAME']"
+          set_env_var "TEST_ARRAY_NAME_$i" ".TEST_ARRAY[$i].TEST_ARRAY_NAME"
         done
 
     - name: Display environment variables
