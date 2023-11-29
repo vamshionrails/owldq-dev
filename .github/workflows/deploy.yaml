@@ -1,4 +1,4 @@
-name: Setup Environment Variables
+name: Load JSON and Set Variables
 
 on:
   push:
@@ -6,23 +6,38 @@ on:
       - main
 
 jobs:
-  setup-env-vars:
+  load-json-and-set-vars:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Install jq
-      run: sudo apt-get update && sudo apt-get install -y jq
-
-    - name: Set up environment variables
+    - name: Load JSON and set variables
+      id: set-env-vars
       run: |
-        CONFIG_JSON=$(cat owldq-dev.json)
+        JSON_CONTENT=$(cat path/to/your/config.json)
+        echo "JSON_CONTENT=$JSON_CONTENT" >> $GITHUB_ENV
 
-        for key in $(echo $CONFIG_JSON | jq -r 'keys_unsorted[]'); do
-          value=$(echo $CONFIG_JSON | jq -r ".$key")
-          echo "$key=$value" >> $GITHUB_ENV
+        # Set individual variables
+        REPO_NAME=$(echo $JSON_CONTENT | jq -r '.REPO_NAME')
+        DESCRIPTION=$(echo $JSON_CONTENT | jq -r '.DESCRIPTION')
+        PRIVATE=$(echo $JSON_CONTENT | jq -r '.PRIVATE')
+
+        echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
+        echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
+        echo "PRIVATE=$PRIVATE" >> $GITHUB_ENV
+
+        # Set nested variables
+        TEST_NAME=$(echo $JSON_CONTENT | jq -r '.TEST.TEST_NAME')
+        echo "TEST_NAME=$TEST_NAME" >> $GITHUB_ENV
+
+        # Set variables from TEST_ARRAY
+        TEST_ARRAY_LENGTH=$(echo $JSON_CONTENT | jq -r '.TEST_ARRAY | length')
+        for ((i=0; i<$TEST_ARRAY_LENGTH; i++)); do
+          TEST_ARRAY_NAME=$(echo $JSON_CONTENT | jq -r ".TEST_ARRAY[$i].TEST_ARRAY_NAME")
+          echo "TEST_ARRAY_NAME_$i=$TEST_ARRAY_NAME" >> $GITHUB_ENV
         done
+
     - name: Display environment variables
       run: env
