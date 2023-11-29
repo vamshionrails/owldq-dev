@@ -1,4 +1,4 @@
-name: populate_matrix_from_json
+name: Setup Environment Variables
 
 on:
   push:
@@ -6,63 +6,23 @@ on:
       - main
 
 jobs:
-  step1:
+  setup-env-vars:
     runs-on: ubuntu-latest
 
-    outputs:
-      matrix: ${{ steps.setup.outputs.matrix }}
-
     steps:
-    - name: Setup
-      id: setup
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install jq
+      run: sudo apt-get update && sudo apt-get install -y jq
+
+    - name: Set up environment variables
       run: |
-        CONFIG='[
-          {
-            "project": "foo",
-            "config": "Debug",
-            "nested": [
-              {
-                "val": "val1"
-              }
-            ]
-          },
-          {
-            "project": "bar",
-            "config": "Release",
-            "nested": [
-              {
-                "val": "val2"
-              },
-              {
-                "val": "val3"
-              }
-            ]
-          }
-        ]'
+        CONFIG_JSON=$(cat owldq-dev.json)
 
-        echo "matrix=$(echo \"$CONFIG\" | jq -r -c .)" >> $GITHUB_ENV
-    
-    - name: Check
-      run: jq . <<< "${{ steps.setup.outputs.matrix }}"
-
-  step2:
-    needs: step1
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        include: ${{fromJson(needs.step1.outputs.matrix)}}
-
-    steps:
-    - name: Check
-      env:
-        MATRIX: ${{ toJSON(matrix) }}
-        PROJECT: ${{ matrix.project }}
-        CONFIG: ${{ matrix.config }}
-        NESTED: ${{ join(matrix.nested.*.val, ', ') }}
-      run: |
-        echo "MATRIX: $(jq -r -c '.' <<< "$MATRIX")"
-        echo "PROJECT: [$PROJECT]"
-        echo "CONFIG: [$CONFIG]"
-        echo "NESTED: [$NESTED]"
+        for key in $(echo $CONFIG_JSON | jq -r 'keys_unsorted[]'); do
+          value=$(echo $CONFIG_JSON | jq -r ".$key")
+          echo "$key=$value" >> $GITHUB_ENV
+        done
+    - name: Display environment variables
+      run: env
