@@ -20,17 +20,12 @@ jobs:
         echo "JSON_CONTENT=$JSON_CONTENT" >> $GITHUB_ENV
 
         # Set individual variables
-        REPO_NAME=$(echo "$JSON_CONTENT" | jq -r '.REPO_NAME')
-        DESCRIPTION=$(echo "$JSON_CONTENT" | jq -r '.DESCRIPTION')
-        PRIVATE=$(echo "$JSON_CONTENT" | jq -r '.PRIVATE')
-
-        echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
-        echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
-        echo "PRIVATE=$PRIVATE" >> $GITHUB_ENV
+        echo "REPO_NAME=$(echo "$JSON_CONTENT" | jq -r '.REPO_NAME')" >> $GITHUB_ENV
+        echo "DESCRIPTION=$(echo "$JSON_CONTENT" | jq -r '.DESCRIPTION')" >> $GITHUB_ENV
+        echo "PRIVATE=$(echo "$JSON_CONTENT" | jq -r '.PRIVATE')" >> $GITHUB_ENV
 
         # Set nested variables
-        TEST_NAME=$(echo "$JSON_CONTENT" | jq -r '.TEST.TEST_NAME')
-        echo "TEST_NAME=$TEST_NAME" >> $GITHUB_ENV
+        echo "TEST_NAME=$(echo "$JSON_CONTENT" | jq -r '.TEST.TEST_NAME')" >> $GITHUB_ENV
 
         # Set variables from TEST_ARRAY
         TEST_ARRAY_LENGTH=$(echo "$JSON_CONTENT" | jq -r '.TEST_ARRAY | length')
