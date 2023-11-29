@@ -1,4 +1,4 @@
-name: Setup Environment Variables
+name: Load JSON and Set Environment Variables
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  setup-env-vars:
+  load-json-and-set-vars:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,17 +16,31 @@ jobs:
     - name: Install jq
       run: sudo apt-get update && sudo apt-get install -y jq
 
-    - name: Set up environment variables
+    - name: Load JSON and set environment variables
+      id: set-env-vars
       run: |
-        CONFIG_JSON=$(cat owldq-dev.json)
-        for key in $(echo $CONFIG_JSON | jq -r 'keys_unsorted[]'); do
-          value=$(echo $CONFIG_JSON | jq -r ".$key")
-          echo "$key=$value" >> $GITHUB_ENV
-        done 
-        
-    - name: values for varaiables
-      run: |
-        echo "DESCRIPTION=$DESCRIPTION"
-        
+        JSON_CONTENT=$(cat path/to/your/config.json)
+        echo "JSON_CONTENT=$JSON_CONTENT" >> $GITHUB_ENV
+
+        # Set variables for all keys, including nested ones
+        set_env_vars_recursive() {
+          local json="$1"
+          local prefix="$2"
+
+          for key in $(echo $json | jq -r 'keys_unsorted[]'); do
+            value=$(echo $json | jq -r ".$key")
+
+            # Handle nested objects
+            if [ "$(echo $value | jq -e 'type')" == "object" ]; then
+              set_env_vars_recursive "$value" "${prefix}${key}_"
+            else
+              echo "${prefix}${key}=$value" >> $GITHUB_ENV
+            fi
+          done
+        }
+
+        # Call the function for the top-level JSON
+        set_env_vars_recursive "$JSON_CONTENT" ""
+
     - name: Display environment variables
       run: env
