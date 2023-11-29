@@ -13,14 +13,28 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Install jq
+      run: sudo apt-get update && sudo apt-get install -y jq
+
     - name: Set up environment variables
       run: |
-        echo "REPO_NAME=owldq-dev" >> $GITHUB_ENV
-        echo "DESCRIPTION=Your repository description" >> $GITHUB_ENV
-        echo "PRIVATE=false" >> $GITHUB_ENV
-        echo "INITIALIZE_README=true" >> $GITHUB_ENV
-        echo "DELETE_REPO=false" >> $GITHUB_ENV
-        echo "USERNAME=vamshionrails" >> $GITHUB_ENV
-        echo "HELMFILE_PATH=./helmfile.yaml" >> $GITHUB_ENV
-        echo "CHARTS_PATH=./helmcharts" >> $GITHUB_ENV
-        echo "REPO_URL=https://raw.githubusercontent.com/\$USERNAME/\$REPO_NAME/main/helmcharts" >> $GITHUB_ENV
+        CONFIG_JSON=$(cat owldq-dev.json)
+        REPO_NAME=$(echo $CONFIG_JSON | jq -r '.REPO_NAME')
+        DESCRIPTION=$(echo $CONFIG_JSON | jq -r '.DESCRIPTION')
+        PRIVATE=$(echo $CONFIG_JSON | jq -r '.PRIVATE')
+        INITIALIZE_README=$(echo $CONFIG_JSON | jq -r '.INITIALIZE_README')
+        DELETE_REPO=$(echo $CONFIG_JSON | jq -r '.DELETE_REPO')
+        USERNAME=$(echo $CONFIG_JSON | jq -r '.USERNAME')
+        HELMFILE_PATH=$(echo $CONFIG_JSON | jq -r '.HELMFILE_PATH')
+        CHARTS_PATH=$(echo $CONFIG_JSON | jq -r '.CHARTS_PATH')
+        REPO_URL=$(echo $CONFIG_JSON | jq -r '.REPO_URL')
+
+        echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
+        echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
+        echo "PRIVATE=$PRIVATE" >> $GITHUB_ENV
+        echo "INITIALIZE_README=$INITIALIZE_README" >> $GITHUB_ENV
+        echo "DELETE_REPO=$DELETE_REPO" >> $GITHUB_ENV
+        echo "USERNAME=$USERNAME" >> $GITHUB_ENV
+        echo "HELMFILE_PATH=$HELMFILE_PATH" >> $GITHUB_ENV
+        echo "CHARTS_PATH=$CHARTS_PATH" >> $GITHUB_ENV
+        echo "REPO_URL=$REPO_URL" >> $GITHUB_ENV
