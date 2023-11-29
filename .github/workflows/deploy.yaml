@@ -27,9 +27,11 @@ jobs:
 
     - name: Load JSON and set variables
       run: |
-        REPO_NAME_WITHOUT_USERNAME="${GITHUB_REPOSITORY#${USERNAME}-}"
-        echo "$REPO_NAME_WITHOUT_USERNAME"
-        JSON_CONTENT=$(cat "${REPO_NAME_WITHOUT_USERNAME}.json")
+        string="vamshionrails/owldq-dev.json"
+        result="${string#vamshionrails/}"
+        echo "$result"
+
+        JSON_CONTENT=$(cat "$result.json")
         echo "$JSON_CONTENT"
         set_env_var() {
           echo "$1=$(echo "$JSON_CONTENT" | jq -r "$2")" >> $GITHUB_ENV
