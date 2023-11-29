@@ -16,26 +16,26 @@ jobs:
     - name: Load JSON and set variables
       id: set-env-vars
       run: |
-        JSON_CONTENT=$(cat owldq-dev.json)
+        JSON_CONTENT=$(cat path/to/your/config.json)
         echo "JSON_CONTENT=$JSON_CONTENT" >> $GITHUB_ENV
 
         # Set individual variables
-        REPO_NAME=$(echo $JSON_CONTENT | jq -r '.REPO_NAME')
-        DESCRIPTION=$(echo $JSON_CONTENT | jq -r '.DESCRIPTION')
-        PRIVATE=$(echo $JSON_CONTENT | jq -r '.PRIVATE')
+        REPO_NAME=$(echo "$JSON_CONTENT" | jq -r '.REPO_NAME')
+        DESCRIPTION=$(echo "$JSON_CONTENT" | jq -r '.DESCRIPTION')
+        PRIVATE=$(echo "$JSON_CONTENT" | jq -r '.PRIVATE')
 
         echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
         echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
         echo "PRIVATE=$PRIVATE" >> $GITHUB_ENV
 
         # Set nested variables
-        TEST_NAME=$(echo $JSON_CONTENT | jq -r '.TEST.TEST_NAME')
+        TEST_NAME=$(echo "$JSON_CONTENT" | jq -r '.TEST.TEST_NAME')
         echo "TEST_NAME=$TEST_NAME" >> $GITHUB_ENV
 
         # Set variables from TEST_ARRAY
-        TEST_ARRAY_LENGTH=$(echo $JSON_CONTENT | jq -r '.TEST_ARRAY | length')
+        TEST_ARRAY_LENGTH=$(echo "$JSON_CONTENT" | jq -r '.TEST_ARRAY | length')
         for ((i=0; i<$TEST_ARRAY_LENGTH; i++)); do
-          TEST_ARRAY_NAME=$(echo $JSON_CONTENT | jq -r ".TEST_ARRAY[$i].TEST_ARRAY_NAME")
+          TEST_ARRAY_NAME=$(echo "$JSON_CONTENT" | jq -r ".TEST_ARRAY[$i].TEST_ARRAY_NAME")
           echo "TEST_ARRAY_NAME_$i=$TEST_ARRAY_NAME" >> $GITHUB_ENV
         done
 
