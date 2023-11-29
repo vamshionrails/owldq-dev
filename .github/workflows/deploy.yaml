@@ -1,46 +1,67 @@
-name: Load JSON and Set Environment Variables
+name: populate_matrix_from_json
 
-on:
-  push:
-    branches:
-      - main
+on: workflow_dispatch
 
 jobs:
-  load-json-and-set-vars:
+  step1:
     runs-on: ubuntu-latest
 
+    outputs:
+      matrix: ${{ steps.setup.outputs.matrix }}
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Install jq
-      run: sudo apt-get update && sudo apt-get install -y jq
-
-    - name: Load JSON and set environment variables
-      id: set-env-vars
+    - name: Setup
+      id: setup
       run: |
-        JSON_CONTENT=$(cat owldq-dev.json)
-        echo "JSON_CONTENT=$JSON_CONTENT" >> $GITHUB_ENV
+        # Create config.json file
+        echo '[
+          {
+            "project": "foo",
+            "config": "Debug",
+            "nested": [
+              {
+                "val": "val1"
+              }
+            ]
+          },
+          {
+            "project": "bar",
+            "config": "Release",
+            "nested": [
+              {
+                "val": "val2"
+              },
+              {
+                "val": "val3"
+              }
+            ]
+          }
+        ]' > config.json
 
-        # Set variables for all keys, including nested ones
-        set_env_vars_recursive() {
-          local json="$1"
-          local prefix="$2"
+        # Output matrix
+        echo "matrix=$(jq -r -c . < config.json)" >> $GITHUB_ENV
+    
+    - name: Check
+      run: jq . <<< "${{ steps.setup.outputs.matrix }}"
 
-          for key in $(echo $json | jq -r 'keys_unsorted[]'); do
-            value=$(echo $json | jq -r ".$key")
+  step2:
+    needs: step1
 
-            # Handle nested objects
-            if [ "$(echo $value | jq -e 'type')" == "object" ]; then
-              set_env_vars_recursive "$value" "${prefix}${key}_"
-            else
-              echo "${prefix}${key}=$value" >> $GITHUB_ENV
-            fi
-          done
-        }
+    runs-on: ubuntu-latest
 
-        # Call the function for the top-level JSON
-        set_env_vars_recursive "$JSON_CONTENT" ""
+    strategy:
+      matrix: 
+        include: ${{ fromJSON(needs.step1.outputs.matrix) }}
 
-    - name: Display environment variables
-      run: env
+    steps:
+    - name: Check
+      env:
+        MATRIX: ${{ toJSON(matrix) }}
+        PROJECT: ${{ matrix.project }}
+        CONFIG: ${{ matrix.config }}
+        NESTED: ${{ join(matrix.nested.*.val, ', ') }}
+      run: |
+        echo "MATRIX: $(jq -r -c '.' <<< "$MATRIX")"
+        echo "PROJECT: [$PROJECT]"
+        echo "CONFIG: [$CONFIG]"
+        echo "NESTED: [$NESTED]"
