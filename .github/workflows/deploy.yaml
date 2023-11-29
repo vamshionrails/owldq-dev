@@ -27,7 +27,8 @@ jobs:
 
     - name: Load JSON and set variables
       run: |
-        JSON_CONTENT=$(cat $GITHUB_REPOSITORY.json)
+        REPO_NAME_WITHOUT_USERNAME="${REPO_NAME#${USERNAME}-}"
+        JSON_CONTENT=$(cat "${REPO_NAME_WITHOUT_USERNAME}.json")
 
         set_env_var() {
           echo "$1=$(echo "$JSON_CONTENT" | jq -r "$2")" >> $GITHUB_ENV
