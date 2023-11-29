@@ -23,7 +23,7 @@ jobs:
 
     - name: Load JSON and set variables
       run: |
-        JSON_CONTENT=$(cat owldq-dev.json)
+        JSON_CONTENT=$(cat $REPO_NAME.json)
 
         set_env_var() {
           echo "$1=$(echo "$JSON_CONTENT" | jq -r "$2")" >> $GITHUB_ENV
