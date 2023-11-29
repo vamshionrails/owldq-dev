@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 try {
-  const config = JSON.parse(fs.readFileSync('path/to/your/config.json', 'utf8'));
+  const config = JSON.parse(fs.readFileSync('owldq-dev.json', 'utf8'));
 
   process.env.REPO_NAME = config.REPO_NAME;
   process.env.DESCRIPTION = config.DESCRIPTION;
