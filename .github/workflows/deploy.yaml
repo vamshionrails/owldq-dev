@@ -27,3 +27,6 @@ jobs:
     - name: values for varaiables
       run: |
         echo "DESCRIPTION=$DESCRIPTION"
+        
+    - name: Display environment variables
+      run: env
