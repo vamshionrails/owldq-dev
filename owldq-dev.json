@@ -13,11 +13,10 @@
   },
   "TEST_ARRAY": [
     {
-       "TEST_ARRAY_NAME": "VAMSHIARRAY"
+      "TEST_ARRAY_NAME": "VAMSHIARRAY"
     },
     {
-      "TEST_ARRAY_NAME  ": "VAMSHIARRAY  1"
+      "TEST_ARRAY_NAME": "VAMSHIARRAY  1"
     }
   ]
-  
 }
