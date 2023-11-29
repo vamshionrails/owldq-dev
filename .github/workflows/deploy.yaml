@@ -13,15 +13,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 14
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Run script to set up environment variables
-      run: node setup-env-vars.js
-      env:
-        REPO_CONFIG: ${{ toJson(github.event_name, github.event.client_payload) }}
+    - name: Set up environment variables
+      run: |
+        REPO_CONFIG=$(cat owldq-dev.json)
+        echo "REPO_CONFIG=$REPO_CONFIG" >> $GITHUB_ENV
