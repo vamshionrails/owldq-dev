@@ -16,7 +16,7 @@ jobs:
     - name: Load JSON and set variables
       id: set-env-vars
       run: |
-        JSON_CONTENT=$(cat path/to/your/config.json)
+        JSON_CONTENT=$(cat owldq-dev.json)
         echo "JSON_CONTENT=$JSON_CONTENT" >> $GITHUB_ENV
 
         # Set individual variables
